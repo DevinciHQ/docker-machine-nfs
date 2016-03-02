@@ -339,10 +339,17 @@ configureNFS()
   done
 
   #TODO Make this check smarter, not everything else will be ubuntu
-  if [ $(uname) == "Darwin"]; then
+  if [ $(uname) == "Darwin" ]; then
     sudo nfsd restart ; sleep 2 && sudo nfsd checkexports
-  else
-    sudo service nfs-kernel-server restart
+  elif [ $(uname) == "Linux" ]; then
+    if [ $(lsb_release --id -s) == "Ubuntu" ]; then
+      sudo service nfs-kernel-server restart
+    elif [ $(lsb_release --id -s) == "Arch" ]; then
+      sudo exportfs -rav
+    else
+      echo "This OS isn't supported yet"
+      exit 1
+    fi
   fi
   echoSuccess "\t\t\t\t\t\tOK"
 }
